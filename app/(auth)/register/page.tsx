@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function RegisterPage() {
       localStorage.setItem("antraai_student_name", form.name);
       localStorage.setItem("antraai_student_class", String(form.class));
 
-      router.push("/chat");
+      router.push("/onboarding");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -172,6 +173,13 @@ export default function RegisterPage() {
             </button>
           </form>
         </div>
+
+        <p className="text-center text-sm text-muted mt-6">
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary hover:underline font-medium">
+            Log in
+          </Link>
+        </p>
       </div>
     </main>
   );

@@ -56,7 +56,15 @@ export async function POST(req: NextRequest) {
     );
 
     for (const q of result.questions) {
-      await updateConceptMastery(studentId, q.conceptId, q.isCorrect);
+      const timedAnswer = answers.find((a: { questionId: string }) => a.questionId === q.questionId);
+      const question = generated.questions.find((q2: { id: string }) => q2.id === q.questionId);
+      await updateConceptMastery(
+        studentId,
+        q.conceptId,
+        q.isCorrect,
+        timedAnswer?.timeTaken,
+        question?.timeEstimate
+      );
     }
 
     await GeneratedTest.deleteOne({ testId });

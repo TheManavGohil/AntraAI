@@ -8,6 +8,7 @@ export interface IStudent extends Document {
   parentPhone: string;
   consentGiven: boolean;
   consentDate?: Date;
+  preferredSubjects: string[];
   createdAt: Date;
 }
 
@@ -20,6 +21,9 @@ export interface IConceptMastery extends Document {
   correct: number;
   lastPracticed?: Date;
   nextReview?: Date;
+  interval: number;
+  repetitions: number;
+  easinessFactor: number;
 }
 
 export interface ITestResult extends Document {
@@ -73,6 +77,23 @@ export interface IGeneratedTest extends Document {
   expiresAt: Date;
 }
 
+export interface ISocraticSession extends Document {
+  _id: Types.ObjectId;
+  studentId: string;
+  conceptId?: string;
+  subject: string;
+  steps: {
+    role: "student" | "tutor";
+    content: string;
+    timestamp: Date;
+  }[];
+  status: "in_progress" | "completed" | "timeout";
+  outcome: "guided" | "direct" | "stuck";
+  stepsCount: number;
+  startedAt: Date;
+  completedAt?: Date;
+}
+
 export interface IChatHistory extends Document {
   _id: Types.ObjectId;
   studentId: string;
@@ -91,6 +112,7 @@ const StudentSchema = new Schema<IStudent>({
   parentPhone: { type: String, required: true },
   consentGiven: { type: Boolean, default: false },
   consentDate: { type: Date },
+  preferredSubjects: { type: [String], default: ["science", "algebra", "geometry"] },
 }, { timestamps: { createdAt: true, updatedAt: false } });
 
 const ConceptMasterySchema = new Schema<IConceptMastery>({
@@ -101,6 +123,9 @@ const ConceptMasterySchema = new Schema<IConceptMastery>({
   correct: { type: Number, default: 0 },
   lastPracticed: { type: Date },
   nextReview: { type: Date },
+  interval: { type: Number, default: 0 },
+  repetitions: { type: Number, default: 0 },
+  easinessFactor: { type: Number, default: 2.5 },
 });
 
 ConceptMasterySchema.index({ studentId: 1, conceptId: 1 }, { unique: true });
@@ -170,8 +195,28 @@ GeneratedTestSchema.index({ testId: 1 });
 GeneratedTestSchema.index({ studentId: 1, createdAt: -1 });
 GeneratedTestSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
+const SocraticSessionSchema = new Schema<ISocraticSession>({
+  studentId: { type: String, required: true, ref: "Student" },
+  conceptId: { type: String },
+  subject: { type: String, required: true },
+  steps: [{
+    role: { type: String, required: true, enum: ["student", "tutor"] },
+    content: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+  }],
+  status: { type: String, required: true, enum: ["in_progress", "completed", "timeout"], default: "in_progress" },
+  outcome: { type: String, required: true, enum: ["guided", "direct", "stuck"], default: "guided" },
+  stepsCount: { type: Number, default: 0 },
+  startedAt: { type: Date, default: Date.now },
+  completedAt: { type: Date },
+}, { timestamps: { createdAt: true, updatedAt: false } });
+
+SocraticSessionSchema.index({ studentId: 1, createdAt: -1 });
+SocraticSessionSchema.index({ studentId: 1, status: 1 });
+
 export const Student = mongoose.models.Student || mongoose.model<IStudent>("Student", StudentSchema);
 export const ConceptMastery = mongoose.models.ConceptMastery || mongoose.model<IConceptMastery>("ConceptMastery", ConceptMasterySchema);
 export const TestResult = mongoose.models.TestResult || mongoose.model<ITestResult>("TestResult", TestResultSchema);
 export const ChatHistory = mongoose.models.ChatHistory || mongoose.model<IChatHistory>("ChatHistory", ChatHistorySchema);
 export const GeneratedTest = mongoose.models.GeneratedTest || mongoose.model<IGeneratedTest>("GeneratedTest", GeneratedTestSchema);
+export const SocraticSession = mongoose.models.SocraticSession || mongoose.model<ISocraticSession>("SocraticSession", SocraticSessionSchema);

@@ -445,11 +445,140 @@ export const CONCEPTS: Concept[] = [
     prerequisites: ["std9_sci_ch15_dna_rna"], masteryThreshold: 0.7,
   },
 
+  // 9th Science - Ch6: Classification of Plants
+  {
+    id: "std9_sci_ch6_plant_classification", name: "Plant Classification Systems", chapter: "Classification of Plants", chapterNum: 6,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Remember",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch6_taxonomic_hierarchy", name: "Taxonomic Hierarchy", chapter: "Classification of Plants", chapterNum: 6,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std9_sci_ch6_plant_classification"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch6_botanical_names", name: "Botanical Nomenclature", chapter: "Classification of Plants", chapterNum: 6,
+    subject: "science", standard: 9, difficulty: "easy", bloomsLevel: "Remember",
+    prerequisites: ["std9_sci_ch6_plant_classification"], masteryThreshold: 0.7,
+  },
+
+  // 9th Science - Ch7: Energy Flow in an Ecosystem
+  {
+    id: "std9_sci_ch7_food_chain", name: "Food Chain and Food Web", chapter: "Energy Flow in an Ecosystem", chapterNum: 7,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch7_trophic_levels", name: "Trophic Levels and Energy Flow", chapter: "Energy Flow in an Ecosystem", chapterNum: 7,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std9_sci_ch7_food_chain"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch7_ecological_pyramids", name: "Ecological Pyramids", chapter: "Energy Flow in an Ecosystem", chapterNum: 7,
+    subject: "science", standard: 9, difficulty: "hard", bloomsLevel: "Analyze",
+    prerequisites: ["std9_sci_ch7_trophic_levels"], masteryThreshold: 0.7,
+  },
+
+  // 9th Science - Ch8: Useful and Harmful Microbes
+  {
+    id: "std9_sci_ch8_useful_bacteria", name: "Useful Bacteria in Daily Life", chapter: "Useful and Harmful Microbes", chapterNum: 8,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Remember",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch8_food_microbes", name: "Microbes in Food Production", chapter: "Useful and Harmful Microbes", chapterNum: 8,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std9_sci_ch8_useful_bacteria"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch8_pathogenic_microbes", name: "Pathogenic Microbes and Diseases", chapter: "Useful and Harmful Microbes", chapterNum: 8,
+    subject: "science", standard: 9, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std9_sci_ch8_useful_bacteria"], masteryThreshold: 0.7,
+  },
+
+  // 9th Science - Ch9: Environmental Management
+  {
+    id: "std9_sci_ch9_environmental_issues", name: "Major Environmental Issues", chapter: "Environmental Management", chapterNum: 9,
+    subject: "science", standard: 9, difficulty: "easy", bloomsLevel: "Remember",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch9_pollution_control", name: "Pollution and Control Measures", chapter: "Environmental Management", chapterNum: 9,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std9_sci_ch9_environmental_issues"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch9_waste_management", name: "Waste Management and Recycling", chapter: "Environmental Management", chapterNum: 9,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std9_sci_ch9_environmental_issues"], masteryThreshold: 0.7,
+  },
+
+  // 9th Science - Ch13: Substances in Common Use
+  {
+    id: "std9_sci_ch13_fibres", name: "Natural and Synthetic Fibres", chapter: "Substances in Common Use", chapterNum: 13,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Remember",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch13_dyes", name: "Dyes and Dyed Fabrics", chapter: "Substances in Common Use", chapterNum: 13,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std9_sci_ch13_fibres"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch13_food_additives", name: "Food Additives and Preservatives", chapter: "Substances in Common Use", chapterNum: 13,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+
+  // 9th Science - Ch16: Introduction to Biotechnology
+  {
+    id: "std9_sci_ch16_biotech_basics", name: "What is Biotechnology?", chapter: "Introduction to Biotechnology", chapterNum: 16,
+    subject: "science", standard: 9, difficulty: "easy", bloomsLevel: "Remember",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch16_genetic_engineering", name: "Genetic Engineering Basics", chapter: "Introduction to Biotechnology", chapterNum: 16,
+    subject: "science", standard: 9, difficulty: "hard", bloomsLevel: "Understand",
+    prerequisites: ["std9_sci_ch16_biotech_basics", "std9_sci_ch15_dna_rna"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch16_bioremediation", name: "Bioremediation and Its Applications", chapter: "Introduction to Biotechnology", chapterNum: 16,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std9_sci_ch16_biotech_basics"], masteryThreshold: 0.7,
+  },
+
+  // 9th Science - Ch17: Observing Space: Telescopes
+  {
+    id: "std9_sci_ch17_telescope_types", name: "Types of Telescopes", chapter: "Observing Space: Telescopes", chapterNum: 17,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Remember",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch17_optical_telescope", name: "Optical Telescope and Its Parts", chapter: "Observing Space: Telescopes", chapterNum: 17,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std9_sci_ch17_telescope_types"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std9_sci_ch17_space_observations", name: "Important Space Observations", chapter: "Observing Space: Telescopes", chapterNum: 17,
+    subject: "science", standard: 9, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std9_sci_ch17_optical_telescope"], masteryThreshold: 0.7,
+  },
+
   // === 10th ALGEBRA ===
   {
     id: "std10_alg_ch1_simultaneous_equations", name: "Simultaneous Linear Equations", chapter: "Linear Equations in Two Variables", chapterNum: 1,
     subject: "algebra", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
     prerequisites: ["std9_alg_ch5_linear_equations"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_alg_ch1_graphical_method", name: "Graphical Method of Solving", chapter: "Linear Equations in Two Variables", chapterNum: 1,
+    subject: "algebra", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std10_alg_ch1_simultaneous_equations"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_alg_ch1_consistent_inconsistent", name: "Consistent and Inconsistent Systems", chapter: "Linear Equations in Two Variables", chapterNum: 1,
+    subject: "algebra", standard: 10, difficulty: "hard", bloomsLevel: "Analyze",
+    prerequisites: ["std10_alg_ch1_simultaneous_equations"], masteryThreshold: 0.7,
   },
   {
     id: "std10_alg_ch2_quadratic_equations", name: "Solving Quadratic Equations", chapter: "Quadratic Equations", chapterNum: 2,
@@ -472,14 +601,49 @@ export const CONCEPTS: Concept[] = [
     prerequisites: ["std10_alg_ch3_ap_concepts"], masteryThreshold: 0.7,
   },
   {
+    id: "std10_alg_ch4_finance_basics", name: "Financial Planning: Budget and Savings", chapter: "Financial Planning", chapterNum: 4,
+    subject: "algebra", standard: 10, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_alg_ch4Compound_interest", name: "Compound Interest and Applications", chapter: "Financial Planning", chapterNum: 4,
+    subject: "algebra", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std10_alg_ch4_finance_basics"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_alg_ch4_emi", name: "EMI and Loan Calculations", chapter: "Financial Planning", chapterNum: 4,
+    subject: "algebra", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_alg_ch4Compound_interest"], masteryThreshold: 0.7,
+  },
+  {
     id: "std10_alg_ch5_probability", name: "Probability Basics", chapter: "Probability", chapterNum: 5,
     subject: "algebra", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
     prerequisites: [], masteryThreshold: 0.7,
   },
   {
+    id: "std10_alg_ch5_coin_die", name: "Probability: Coin Toss and Dice", chapter: "Probability", chapterNum: 5,
+    subject: "algebra", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std10_alg_ch5_probability"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_alg_ch5_tree_diagram", name: "Tree Diagram and Sample Space", chapter: "Probability", chapterNum: 5,
+    subject: "algebra", standard: 10, difficulty: "hard", bloomsLevel: "Analyze",
+    prerequisites: ["std10_alg_ch5_probability"], masteryThreshold: 0.7,
+  },
+  {
     id: "std10_alg_ch6_statistics", name: "Mean, Median, Mode of Grouped Data", chapter: "Statistics", chapterNum: 6,
     subject: "algebra", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
     prerequisites: ["std9_alg_ch7_mean_median_mode"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_alg_ch6_ogive", name: "Ogive and Median from Graph", chapter: "Statistics", chapterNum: 6,
+    subject: "algebra", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_alg_ch6_statistics"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_alg_ch6_mode_grouped", name: "Mode of Grouped Data", chapter: "Statistics", chapterNum: 6,
+    subject: "algebra", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_alg_ch6_statistics"], masteryThreshold: 0.7,
   },
 
   // === 10th GEOMETRY ===
@@ -499,9 +663,54 @@ export const CONCEPTS: Concept[] = [
     prerequisites: [], masteryThreshold: 0.7,
   },
   {
+    id: "std10_geo_ch2_converse", name: "Converse of Pythagoras Theorem", chapter: "Pythagoras Theorem", chapterNum: 2,
+    subject: "geometry", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch2_pythagoras"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch2_applications", name: "Applications of Pythagoras Theorem", chapter: "Pythagoras Theorem", chapterNum: 2,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch2_pythagoras"], masteryThreshold: 0.7,
+  },
+  {
     id: "std10_geo_ch3_circle_theorems", name: "Theorems on Circle", chapter: "Circle", chapterNum: 3,
     subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
     prerequisites: ["std9_geo_ch6_circle_basics"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch3_tangent_theorem", name: "Tangent-Secant Theorem", chapter: "Circle", chapterNum: 3,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch3_circle_theorems"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch3_cyclic_quadrilateral", name: "Cyclic Quadrilateral Properties", chapter: "Circle", chapterNum: 3,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch3_circle_theorems"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch4_construction_similarity", name: "Construction of Similar Triangles", chapter: "Geometric Constructions", chapterNum: 4,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch1_similarity"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch4_construction_tangent", name: "Construction of Tangent to Circle", chapter: "Geometric Constructions", chapterNum: 4,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch3_circle_theorems"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch5_section_formula_10", name: "Section Formula in Coordinate Geometry", chapter: "Coordinate Geometry", chapterNum: 5,
+    subject: "geometry", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std9_geo_ch7_distance_formula"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch5_division_formula", name: "Internal and External Division", chapter: "Coordinate Geometry", chapterNum: 5,
+    subject: "geometry", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch5_section_formula_10"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch5_midpoint_10", name: "Midpoint in Coordinate Geometry", chapter: "Coordinate Geometry", chapterNum: 5,
+    subject: "geometry", standard: 10, difficulty: "easy", bloomsLevel: "Remember",
+    prerequisites: ["std9_geo_ch7_distance_formula"], masteryThreshold: 0.7,
   },
   {
     id: "std10_geo_ch6_trig_identities", name: "Trigonometric Identities", chapter: "Trigonometry", chapterNum: 6,
@@ -509,9 +718,29 @@ export const CONCEPTS: Concept[] = [
     prerequisites: ["std9_geo_ch8_trig_ratios"], masteryThreshold: 0.7,
   },
   {
+    id: "std10_geo_ch6_heights_distances", name: "Heights and Distances", chapter: "Trigonometry", chapterNum: 6,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch6_trig_identities"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch6_trig_ratios_10", name: "Trigonometric Ratios of Specific Angles", chapter: "Trigonometry", chapterNum: 6,
+    subject: "geometry", standard: 10, difficulty: "medium", bloomsLevel: "Remember",
+    prerequisites: ["std9_geo_ch8_trig_ratios"], masteryThreshold: 0.7,
+  },
+  {
     id: "std10_geo_ch7_mensuration", name: "Surface Area and Volume Combined", chapter: "Mensuration", chapterNum: 7,
     subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
     prerequisites: ["std9_geo_ch9_surface_area", "std9_geo_ch9_volume"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch7_frustums", name: "Frustum of a Cone", chapter: "Mensuration", chapterNum: 7,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch7_mensuration"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_geo_ch7_combined_solids", name: "Problems on Combined Solids", chapter: "Mensuration", chapterNum: 7,
+    subject: "geometry", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_geo_ch7_mensuration"], masteryThreshold: 0.7,
   },
 
   // === 10th SCIENCE ===
@@ -531,9 +760,29 @@ export const CONCEPTS: Concept[] = [
     prerequisites: ["std9_sci_ch4_valency_ions"], masteryThreshold: 0.7,
   },
   {
+    id: "std10_sci_ch2_periodic_trends", name: "Periodic Trends: Atomic Size, Metallic Character", chapter: "Periodic Classification of Elements", chapterNum: 2,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std10_sci_ch2_periodic_table"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch2_mendeleev", name: "Mendeleev's Periodic Table", chapter: "Periodic Classification of Elements", chapterNum: 2,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Remember",
+    prerequisites: ["std10_sci_ch2_periodic_table"], masteryThreshold: 0.7,
+  },
+  {
     id: "std10_sci_ch3_chemical_reactions", name: "Types of Chemical Reactions", chapter: "Chemical Reactions and Equations", chapterNum: 3,
     subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Understand",
     prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch3_balancing", name: "Balancing Chemical Equations", chapter: "Chemical Reactions and Equations", chapterNum: 3,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch3_chemical_reactions"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch3_oxidation_reduction", name: "Oxidation and Reduction Reactions", chapter: "Chemical Reactions and Equations", chapterNum: 3,
+    subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch3_chemical_reactions"], masteryThreshold: 0.7,
   },
   {
     id: "std10_sci_ch4_ohms_law_advanced", name: "Ohm's Law: Advanced Applications", chapter: "Effects of Electric Current", chapterNum: 4,
@@ -551,9 +800,29 @@ export const CONCEPTS: Concept[] = [
     prerequisites: [], masteryThreshold: 0.7,
   },
   {
+    id: "std10_sci_ch5_calorimetry", name: "Calorimetry and Heat Exchange", chapter: "Heat", chapterNum: 5,
+    subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch5_heat_transfer"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch5_change_of_state", name: "Change of State of Matter", chapter: "Heat", chapterNum: 5,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std10_sci_ch5_heat_transfer"], masteryThreshold: 0.7,
+  },
+  {
     id: "std10_sci_ch6_refraction", name: "Refraction of Light", chapter: "Refraction of Light", chapterNum: 6,
     subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
     prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch6_snells_law", name: "Snell's Law and Refractive Index", chapter: "Refraction of Light", chapterNum: 6,
+    subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch6_refraction"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch6_total_internal", name: "Total Internal Reflection", chapter: "Refraction of Light", chapterNum: 6,
+    subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch6_refraction"], masteryThreshold: 0.7,
   },
   {
     id: "std10_sci_ch7_lens_formula", name: "Lens Formula and Magnification", chapter: "Lenses", chapterNum: 7,
@@ -561,9 +830,29 @@ export const CONCEPTS: Concept[] = [
     prerequisites: ["std10_sci_ch6_refraction"], masteryThreshold: 0.7,
   },
   {
+    id: "std10_sci_ch7_lens_power", name: "Power of a Lens", chapter: "Lenses", chapterNum: 7,
+    subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch7_lens_formula"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch7_combination_lenses", name: "Combination of Lenses", chapter: "Lenses", chapterNum: 7,
+    subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch7_lens_formula"], masteryThreshold: 0.7,
+  },
+  {
     id: "std10_sci_ch8_metals_properties", name: "Properties of Metals", chapter: "Metallurgy", chapterNum: 8,
     subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Remember",
     prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch8_ore_processing", name: "Extraction of Metals from Ores", chapter: "Metallurgy", chapterNum: 8,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std10_sci_ch8_metals_properties"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch8_alloys", name: "Alloys and Their Uses", chapter: "Metallurgy", chapterNum: 8,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch8_metals_properties"], masteryThreshold: 0.7,
   },
   {
     id: "std10_sci_ch9_covalent_bonding", name: "Covalent Bonding in Carbon", chapter: "Carbon Compounds", chapterNum: 9,
@@ -574,6 +863,26 @@ export const CONCEPTS: Concept[] = [
     id: "std10_sci_ch9_organic_compounds", name: "Homologous Series and Reactions", chapter: "Carbon Compounds", chapterNum: 9,
     subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
     prerequisites: ["std10_sci_ch9_covalent_bonding"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch9_functional_groups", name: "Functional Groups in Organic Chemistry", chapter: "Carbon Compounds", chapterNum: 9,
+    subject: "science", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
+    prerequisites: ["std10_sci_ch9_covalent_bonding"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch10_space_missions", name: "Important Space Missions", chapter: "Space Missions", chapterNum: 10,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Remember",
+    prerequisites: [], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch10_satellites", name: "Types of Satellites and Orbits", chapter: "Space Missions", chapterNum: 10,
+    subject: "science", standard: 10, difficulty: "medium", bloomsLevel: "Understand",
+    prerequisites: ["std10_sci_ch10_space_missions"], masteryThreshold: 0.7,
+  },
+  {
+    id: "std10_sci_ch10_isro", name: "ISRO and Indian Space Programme", chapter: "Space Missions", chapterNum: 10,
+    subject: "science", standard: 10, difficulty: "easy", bloomsLevel: "Remember",
+    prerequisites: ["std10_sci_ch10_space_missions"], masteryThreshold: 0.7,
   },
 ];
 

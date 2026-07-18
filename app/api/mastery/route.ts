@@ -11,6 +11,7 @@ import {
 import {
   getChapterProgress,
   getSubjectProgress,
+  getNextConcepts,
 } from "@/lib/mastery/knowledge-graph";
 import { CONCEPTS } from "@/lib/utils/constants";
 import { Types } from "mongoose";
@@ -79,6 +80,23 @@ export async function GET(req: NextRequest) {
       geometry: await computeSubjectMastery(studentId, "geometry"),
     };
 
+    const masteredConceptIds = masteries
+      .filter(m => m.mastery >= 0.7)
+      .map(m => m.conceptId);
+
+    const studentSubjects = student.preferredSubjects || ["science", "algebra", "geometry"];
+    const learningPaths: Record<string, { id: string; name: string; chapter: string; difficulty: string }[]> = {};
+
+    for (const subj of studentSubjects) {
+      const nextConcepts = getNextConcepts(masteredConceptIds, subj, student.class);
+      learningPaths[subj] = nextConcepts.slice(0, 5).map(c => ({
+        id: c.id,
+        name: c.name,
+        chapter: c.chapter,
+        difficulty: c.difficulty,
+      }));
+    }
+
     // Get recent test results
     const recentTests = await TestResult.find({ studentId })
       .sort({ takenAt: -1 })
@@ -111,6 +129,7 @@ export async function GET(req: NextRequest) {
       chapterProgress,
       subjectProgress,
       subjectMastery,
+      learningPaths,
       recentTests,
     });
   } catch (error) {

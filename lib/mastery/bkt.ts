@@ -1,6 +1,7 @@
 import { ConceptMastery, IConceptMastery } from "@/lib/db/schemas";
 import { CONCEPTS, Concept } from "@/lib/utils/constants";
 import { connectDB } from "@/lib/db/mongodb";
+import { sm2, performanceRating } from "@/lib/mastery/spaced-repetition";
 
 export interface BKTParams {
   p_L0: number;  // Prior probability of knowing the concept
@@ -69,14 +70,20 @@ export async function initializeStudentMastery(studentId: string, standard: numb
 export async function updateConceptMastery(
   studentId: string,
   conceptId: string,
-  isCorrect: boolean
+  isCorrect: boolean,
+  timeTakenSeconds?: number,
+  timeEstimate?: number
 ): Promise<IConceptMastery> {
   await connectDB();
+
+  const rating = performanceRating(isCorrect, timeTakenSeconds || 0, timeEstimate || 0);
 
   const existing = await ConceptMastery.findOne({ studentId, conceptId });
 
   if (!existing) {
     const newMastery = updateMastery(DEFAULT_BKT.p_L0, isCorrect);
+    const sr = sm2(rating, { interval: 0, repetitions: 0, easinessFactor: 2.5 });
+
     return ConceptMastery.findOneAndUpdate(
       { studentId, conceptId },
       {
@@ -85,6 +92,10 @@ export async function updateConceptMastery(
           attempts: 1,
           correct: isCorrect ? 1 : 0,
           lastPracticed: new Date(),
+          nextReview: sr.nextReview,
+          interval: sr.interval,
+          repetitions: sr.repetitions,
+          easinessFactor: sr.easinessFactor,
         },
       },
       { upsert: true, returnDocument: "after" }
@@ -92,6 +103,11 @@ export async function updateConceptMastery(
   }
 
   const newMastery = updateMastery(existing.masteryProbability, isCorrect);
+  const sr = sm2(rating, {
+    interval: existing.interval,
+    repetitions: existing.repetitions,
+    easinessFactor: existing.easinessFactor,
+  });
 
   return ConceptMastery.findOneAndUpdate(
     { studentId, conceptId },
@@ -99,6 +115,10 @@ export async function updateConceptMastery(
       $set: {
         masteryProbability: newMastery,
         lastPracticed: new Date(),
+        nextReview: sr.nextReview,
+        interval: sr.interval,
+        repetitions: sr.repetitions,
+        easinessFactor: sr.easinessFactor,
       },
       $inc: {
         attempts: 1,
@@ -256,4 +276,51 @@ export async function computeSubjectMastery(
 
   const total = subjectMasteries.reduce((sum, m) => sum + m.mastery, 0);
   return total / subjectMasteries.length;
+}
+
+export function applyForgettingCurve(
+  mastery: number,
+  lastPracticed?: Date | null,
+  easinessFactor?: number
+): number {
+  if (!lastPracticed) return mastery;
+
+  const daysSincePractice = (Date.now() - new Date(lastPracticed).getTime()) / (1000 * 60 * 60 * 24);
+
+  if (daysSincePractice <= 0) return mastery;
+
+  const stability = Math.max(1, (easinessFactor || 2.5) * 2);
+
+  const decayedMastery = mastery * Math.exp(-daysSincePractice / stability);
+
+  return Math.max(0.01, Math.min(mastery, decayedMastery));
+}
+
+export async function getStudentMasteryProfileWithDecay(studentId: string): Promise<{
+  conceptId: string;
+  mastery: number;
+  displayMastery: number;
+  attempts: number;
+  correct: number;
+  lastPracticed?: Date;
+  nextReview?: Date;
+  interval: number;
+  repetitions: number;
+  easinessFactor: number;
+}[]> {
+  await connectDB();
+
+  const masteries = await ConceptMastery.find({ studentId });
+  return masteries.map(m => ({
+    conceptId: m.conceptId,
+    mastery: m.masteryProbability,
+    displayMastery: applyForgettingCurve(m.masteryProbability, m.lastPracticed, m.easinessFactor),
+    attempts: m.attempts,
+    correct: m.correct,
+    lastPracticed: m.lastPracticed,
+    nextReview: m.nextReview,
+    interval: m.interval,
+    repetitions: m.repetitions,
+    easinessFactor: m.easinessFactor,
+  }));
 }

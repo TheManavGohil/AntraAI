@@ -2,7 +2,6 @@ import { searchTextbooks } from "@/lib/db/chroma";
 import { generateWithGemini } from "@/lib/ai/gemini";
 import { generateWithGroq } from "@/lib/ai/groq";
 import { getDirectAnswerSystemPrompt, getSocraticSystemPrompt } from "@/lib/ai/prompts";
-import { getConceptById } from "@/lib/utils/constants";
 import { ConceptMastery } from "@/lib/db/schemas";
 
 export interface RAGResponse {
@@ -21,18 +20,28 @@ export async function queryAssistant(
     socraticMode?: boolean;
     conceptId?: string;
     studentId?: string;
+    conversationContext?: string;
+    socraticStep?: number;
   }
 ): Promise<RAGResponse> {
-  const { studentName, studentClass, subject, masteryPercent, socraticMode = false, conceptId, studentId } = options;
+  const {
+    studentName,
+    studentClass,
+    subject,
+    masteryPercent,
+    socraticMode = false,
+    conceptId,
+    studentId,
+    conversationContext,
+    socraticStep,
+  } = options;
 
-  // Step 1: Retrieve relevant textbook chunks
   const searchResults = await searchTextbooks(question, {
     nResults: 5,
     standard: studentClass,
     subject: subject,
   });
 
-  // Step 2: Build context from retrieved chunks
   const context = searchResults.documents
     .map((doc, i) => {
       const meta = searchResults.metadatas[i];
@@ -40,7 +49,6 @@ export async function queryAssistant(
     })
     .join("\n\n---\n\n");
 
-  // Step 3: Determine mastery — use concept-specific if available, else subject-level
   let conceptMastery = masteryPercent;
   if (conceptId && studentId) {
     const conceptRecord = await ConceptMastery.findOne({ studentId, conceptId });
@@ -49,27 +57,24 @@ export async function queryAssistant(
     }
   }
 
-  // Step 4: Build system prompt based on mode
   const systemPrompt = socraticMode
-    ? getSocraticSystemPrompt(studentName, studentClass, conceptMastery, subject)
+    ? getSocraticSystemPrompt(studentName, studentClass, conceptMastery, subject, socraticStep)
     : getDirectAnswerSystemPrompt(studentName, studentClass, conceptMastery, subject);
 
-  // Step 5: Generate response (try Gemini first, fallback to Groq)
-  let answer: string;
-  try {
-    answer = await generateWithGemini(
-      `Based on the following textbook content, answer the student's question.\n\n${context}\n\nQuestion: ${question}`,
-      systemPrompt
-    );
-  } catch {
-    console.log("Gemini failed, falling back to Groq");
-    answer = await generateWithGroq(
-      `Based on the following textbook content, answer the student's question.\n\n${context}\n\nQuestion: ${question}`,
-      systemPrompt
-    );
+  let userPrompt = `Based on the following textbook content, answer the student's question.\n\nTextbook Context:\n${context}\n\nQuestion: ${question}`;
+
+  if (conversationContext) {
+    userPrompt = `CONVERSATION HISTORY (most recent first):\n${conversationContext}\n\n---\n\nBased on the following textbook content and the conversation history, respond to the student's latest message.\n\nTextbook Context:\n${context}\n\nStudent's latest message: ${question}`;
   }
 
-  // Step 6: Build sources list
+  let answer: string;
+  try {
+    answer = await generateWithGemini(userPrompt, systemPrompt);
+  } catch {
+    console.log("Gemini failed, falling back to Groq");
+    answer = await generateWithGroq(userPrompt, systemPrompt);
+  }
+
   const sources = searchResults.metadatas.map((meta) => ({
     chapter: (meta.chapter as string) || "Unknown",
     page: meta.page_number as number | undefined,
