@@ -606,14 +606,14 @@ export const CONCEPTS: Concept[] = [
     prerequisites: [], masteryThreshold: 0.7,
   },
   {
-    id: "std10_alg_ch4Compound_interest", name: "Compound Interest and Applications", chapter: "Financial Planning", chapterNum: 4,
+    id: "std10_alg_ch4_compound_interest", name: "Compound Interest and Applications", chapter: "Financial Planning", chapterNum: 4,
     subject: "algebra", standard: 10, difficulty: "medium", bloomsLevel: "Apply",
     prerequisites: ["std10_alg_ch4_finance_basics"], masteryThreshold: 0.7,
   },
   {
     id: "std10_alg_ch4_emi", name: "EMI and Loan Calculations", chapter: "Financial Planning", chapterNum: 4,
     subject: "algebra", standard: 10, difficulty: "hard", bloomsLevel: "Apply",
-    prerequisites: ["std10_alg_ch4Compound_interest"], masteryThreshold: 0.7,
+    prerequisites: ["std10_alg_ch4_compound_interest"], masteryThreshold: 0.7,
   },
   {
     id: "std10_alg_ch5_probability", name: "Probability Basics", chapter: "Probability", chapterNum: 5,

@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
       .select("subject percentage takenAt testType");
 
     const conceptBreakdown: Record<string, { correct: number; total: number; percentage: number }> = {};
-    const allTests = await TestResult.find({ studentId }).select("questions");
+    const allTests = await TestResult.find({ studentId }).sort({ takenAt: -1 }).limit(50).select("questions");
     for (const test of allTests) {
       for (const q of test.questions) {
         if (!conceptBreakdown[q.conceptId]) {

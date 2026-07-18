@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import { Student, TestResult } from "@/lib/db/schemas";
 import { initializeStudentMastery, updateConceptMastery } from "@/lib/mastery/bkt";
-import { CONCEPTS } from "@/lib/utils/constants";
 import { Types } from "mongoose";
 
 export async function POST(req: NextRequest) {
@@ -35,14 +34,7 @@ export async function POST(req: NextRequest) {
       $set: { preferredSubjects },
     });
 
-    for (const subject of preferredSubjects) {
-      const subjectConcepts = CONCEPTS.filter(
-        c => c.subject === subject && c.standard === student.class
-      );
-      const conceptIds = subjectConcepts.map(c => c.id);
-      await initializeStudentMastery(studentId, student.class);
-      void conceptIds;
-    }
+    await initializeStudentMastery(studentId, student.class);
 
     if (diagnosticAnswers && Array.isArray(diagnosticAnswers)) {
       let totalCorrect = 0;

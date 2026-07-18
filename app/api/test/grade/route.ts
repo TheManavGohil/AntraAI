@@ -46,6 +46,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const gradingLock = await GeneratedTest.findOneAndUpdate(
+      { testId, graded: { $ne: true } },
+      { $set: { graded: true } },
+      { returnDocument: "after" }
+    );
+
+    if (!gradingLock) {
+      return NextResponse.json(
+        { error: "Test has already been graded" },
+        { status: 409 }
+      );
+    }
+
     const result = await gradeTest(
       studentId,
       testId,

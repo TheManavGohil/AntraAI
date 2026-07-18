@@ -5,9 +5,25 @@ import { queryAssistant, classifyQueryIntent } from "@/lib/ai/rag";
 import { computeSubjectMastery } from "@/lib/mastery/bkt";
 import { authenticateStudent } from "@/lib/middleware/auth";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/middleware/rate-limit";
+import { CONCEPTS } from "@/lib/utils/constants";
 
 const CONVERSATION_CONTEXT_SIZE = 10;
 const SOCRATIC_TIMEOUT_STEPS = 12;
+
+function matchConceptId(name: string, subject: string, studentClass: number): string | undefined {
+  const normalized = name.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
+  const candidates = CONCEPTS.filter(c => c.subject === subject && c.standard === studentClass);
+
+  for (const c of candidates) {
+    const idNorm = c.id.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
+    const nameNorm = c.name.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
+    if (idNorm.includes(normalized) || normalized.includes(idNorm) ||
+        nameNorm.includes(normalized) || normalized.includes(nameNorm)) {
+      return c.id;
+    }
+  }
+  return undefined;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,8 +50,8 @@ export async function POST(req: NextRequest) {
     }
 
     const intent = await classifyQueryIntent(message);
-    const subject = reqSubject || intent.suggestedSubject;
-    const conceptId = reqConceptId || (intent.suggestedConcept ? intent.suggestedConcept.toLowerCase().replace(/\s+/g, "_") : undefined);
+    const subject = reqSubject || (intent.suggestedSubject !== "general" ? intent.suggestedSubject : student.preferredSubjects?.[0] || "science");
+    const conceptId = reqConceptId || (intent.suggestedConcept ? matchConceptId(intent.suggestedConcept, subject, student.class) : undefined);
 
     await ChatHistory.create({
       studentId,

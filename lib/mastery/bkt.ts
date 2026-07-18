@@ -12,10 +12,12 @@ export interface BKTParams {
 
 const DEFAULT_BKT: BKTParams = {
   p_L0: 0.3,
-  p_T: 0.1,
+  p_T: 0.03,
   p_S: 0.05,
   p_G: 0.2,
 };
+
+const MAX_DELTA_PER_UPDATE = 0.15;
 
 export function updateMastery(
   currentMastery: number,
@@ -40,7 +42,13 @@ export function updateMastery(
 
   const updatedMastery = p_K_given_obs + (1 - p_K_given_obs) * params.p_T;
 
-  return Math.min(Math.max(updatedMastery, 0.01), 0.99);
+  const raw = Math.min(Math.max(updatedMastery, 0.01), 0.99);
+  const delta = raw - currentMastery;
+  if (Math.abs(delta) > MAX_DELTA_PER_UPDATE) {
+    const capped = currentMastery + Math.sign(delta) * MAX_DELTA_PER_UPDATE;
+    return Math.min(Math.max(capped, 0.01), 0.99);
+  }
+  return raw;
 }
 
 export async function initializeStudentMastery(studentId: string, standard: number): Promise<void> {
@@ -224,25 +232,34 @@ export async function getConceptsForTest(
   const strongCount = count - weakCount - reviewCount;
 
   const result: { concept: Concept; mastery: number; priority: "weak" | "review" | "strong" }[] = [];
+  const usedIds = new Set<string>();
 
   // Weakest first
-  for (let i = 0; i < Math.min(weakCount, conceptsWithMastery.length); i++) {
-    result.push({ ...conceptsWithMastery[i], priority: "weak" });
-  }
-
-  // Review (middle range)
-  const midStart = Math.floor(conceptsWithMastery.length * 0.3);
-  for (let i = midStart; i < Math.min(midStart + reviewCount, conceptsWithMastery.length); i++) {
-    if (!result.find(r => r.concept.id === conceptsWithMastery[i].concept.id)) {
-      result.push({ ...conceptsWithMastery[i], priority: "review" });
+  for (let i = 0; i < conceptsWithMastery.length && result.length < weakCount; i++) {
+    const c = conceptsWithMastery[i];
+    if (!usedIds.has(c.concept.id)) {
+      result.push({ ...c, priority: "weak" });
+      usedIds.add(c.concept.id);
     }
   }
 
-  // Strong (maintenance check)
-  const strongStart = Math.floor(conceptsWithMastery.length * 0.7);
-  for (let i = strongStart; i < Math.min(strongStart + strongCount, conceptsWithMastery.length); i++) {
-    if (!result.find(r => r.concept.id === conceptsWithMastery[i].concept.id)) {
-      result.push({ ...conceptsWithMastery[i], priority: "strong" });
+  // Review (middle third of the sorted list)
+  const reviewStart = Math.floor(conceptsWithMastery.length / 3);
+  for (let i = reviewStart; i < conceptsWithMastery.length && result.length < weakCount + reviewCount; i++) {
+    const c = conceptsWithMastery[i];
+    if (!usedIds.has(c.concept.id)) {
+      result.push({ ...c, priority: "review" });
+      usedIds.add(c.concept.id);
+    }
+  }
+
+  // Strong (top third of the sorted list)
+  const strongStart = Math.floor(conceptsWithMastery.length * 2 / 3);
+  for (let i = strongStart; i < conceptsWithMastery.length && result.length < count; i++) {
+    const c = conceptsWithMastery[i];
+    if (!usedIds.has(c.concept.id)) {
+      result.push({ ...c, priority: "strong" });
+      usedIds.add(c.concept.id);
     }
   }
 

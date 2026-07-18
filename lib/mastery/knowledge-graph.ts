@@ -52,7 +52,9 @@ export function getPrerequisiteChain(conceptId: string): Concept[] {
       traverse(prereqId);
     }
 
-    chain.push(concept);
+    if (id !== conceptId) {
+      chain.push(concept);
+    }
   }
 
   traverse(conceptId);

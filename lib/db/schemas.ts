@@ -29,7 +29,7 @@ export interface IConceptMastery extends Document {
 export interface ITestResult extends Document {
   _id: Types.ObjectId;
   studentId: string;
-  testType: "diagnostic" | "weekly" | "quiz";
+  testType: "diagnostic" | "weekly" | "quiz" | "review";
   subject: string;
   score: number;
   totalMarks: number;
@@ -60,7 +60,7 @@ export interface IGeneratedTest extends Document {
   testId: string;
   studentId: string;
   subject: string;
-  type: "diagnostic" | "weekly" | "quiz";
+  type: "diagnostic" | "weekly" | "quiz" | "review";
   questions: {
     id: string;
     type: "MCQ" | "short_2mark" | "short_3mark" | "long_5mark";
@@ -73,6 +73,7 @@ export interface IGeneratedTest extends Document {
   }[];
   totalMarks: number;
   timeLimitMinutes: number;
+  graded?: boolean;
   createdAt: Date;
   expiresAt: Date;
 }
@@ -132,7 +133,7 @@ ConceptMasterySchema.index({ studentId: 1, conceptId: 1 }, { unique: true });
 
 const TestResultSchema = new Schema<ITestResult>({
   studentId: { type: String, required: true, ref: "Student" },
-  testType: { type: String, required: true, enum: ["diagnostic", "weekly", "quiz"] },
+  testType: { type: String, required: true, enum: ["diagnostic", "weekly", "quiz", "review"] },
   subject: { type: String, required: true },
   score: { type: Number, required: true },
   totalMarks: { type: Number, required: true },
@@ -175,7 +176,7 @@ const GeneratedTestSchema = new Schema<IGeneratedTest>({
   testId: { type: String, required: true, unique: true },
   studentId: { type: String, required: true, ref: "Student" },
   subject: { type: String, required: true },
-  type: { type: String, required: true, enum: ["diagnostic", "weekly", "quiz"] },
+  type: { type: String, required: true, enum: ["diagnostic", "weekly", "quiz", "review"] },
   questions: [{
     id: { type: String, required: true },
     type: { type: String, required: true, enum: ["MCQ", "short_2mark", "short_3mark", "long_5mark"] },
@@ -188,6 +189,7 @@ const GeneratedTestSchema = new Schema<IGeneratedTest>({
   }],
   totalMarks: { type: Number, required: true },
   timeLimitMinutes: { type: Number, required: true },
+  graded: { type: Boolean, default: false },
   expiresAt: { type: Date, required: true },
 }, { timestamps: { createdAt: true, updatedAt: false } });
 
