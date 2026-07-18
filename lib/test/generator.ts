@@ -1,6 +1,6 @@
 import { generateWithGemini } from "@/lib/ai/gemini";
 import { generateWithGroq } from "@/lib/ai/groq";
-import { getTestGenerationPrompt } from "@/lib/ai/prompts";
+import { getTestGenerationPrompt, getGradingPrompt, getInsightsPrompt } from "@/lib/ai/prompts";
 import { getConceptsForTest, updateConceptMastery } from "@/lib/mastery/bkt";
 import { CONCEPTS, Concept } from "@/lib/utils/constants";
 import { TestResult } from "@/lib/db/schemas";
@@ -22,7 +22,7 @@ export interface Question {
 export interface Test {
   id: string;
   subject: string;
-  type: "diagnostic" | "weekly" | "quiz";
+  type: "diagnostic" | "weekly" | "quiz" | "review";
   questions: Question[];
   totalMarks: number;
   timeLimitMinutes: number;
@@ -66,13 +66,29 @@ function getTimeForType(type: string): number {
 export async function generateTest(
   studentId: string,
   subject: string,
-  testType: "diagnostic" | "weekly" | "quiz",
+  testType: "diagnostic" | "weekly" | "quiz" | "review",
   standard: number,
   conceptId?: string
 ): Promise<Test> {
   await connectDB();
 
   let selectedConcepts: { name: string; difficulty: string; bloomsLevel: string; chapter: string; id: string }[];
+
+  if (testType === "review") {
+    const { getWeakConcepts } = await import("@/lib/mastery/bkt");
+    const weakConcepts = await getWeakConcepts(studentId, 0.5, subject);
+    selectedConcepts = weakConcepts.slice(0, 10).map(w => ({
+      name: w.concept.name,
+      difficulty: w.concept.difficulty,
+      bloomsLevel: w.concept.bloomsLevel,
+      chapter: w.concept.chapter,
+      id: w.concept.id,
+    }));
+
+    if (selectedConcepts.length === 0) {
+      testType = "weekly";
+    }
+  }
 
   if (testType === "diagnostic") {
     // For diagnostic: select concepts spread across all chapters
@@ -127,7 +143,7 @@ export async function generateTest(
       }));
   }
 
-  const questionCount = testType === "diagnostic" ? 10 : testType === "weekly" ? 15 : 5;
+  const questionCount = testType === "diagnostic" ? 10 : testType === "weekly" ? 15 : testType === "review" ? 10 : 5;
   const questionTypes = determineQuestionTypes(questionCount);
   const prompt = getTestGenerationPrompt(subject, standard, selectedConcepts, questionTypes);
 
@@ -174,7 +190,7 @@ export async function generateTest(
     type: testType,
     questions,
     totalMarks,
-    timeLimitMinutes: testType === "diagnostic" ? 30 : testType === "weekly" ? 45 : 15,
+    timeLimitMinutes: testType === "diagnostic" ? 30 : testType === "weekly" ? 45 : testType === "review" ? 30 : 15,
   };
 }
 
@@ -184,9 +200,9 @@ export async function gradeTest(
   answers: { questionId: string; answer: string; timeTaken: number }[],
   questions: Question[],
   subject: string,
-  testType: "diagnostic" | "weekly" | "quiz"
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<any> {
+  testType: "diagnostic" | "weekly" | "quiz" | "review",
+  studentName?: string
+): Promise<unknown> {
   await connectDB();
 
   const gradedQuestions = [];
@@ -207,9 +223,8 @@ export async function gradeTest(
       isCorrect = answer.answer.trim().toLowerCase() === question.correctAnswer.trim().toLowerCase();
       marksAwarded = isCorrect ? question.marks : 0;
     } else {
-      // For subjective questions, use AI grading
       try {
-        const gradingPrompt = `Grade this answer:\n\nQuestion: ${question.question}\nModel Answer: ${question.correctAnswer}\nStudent Answer: ${answer.answer}\nMarks: ${question.marks}\n\nReturn JSON: {"marksAwarded": <number>, "isCorrect": <boolean>}`;
+        const gradingPrompt = getGradingPrompt(question.question, question.correctAnswer, answer.answer, question.marks);
 
         let gradingResponse: string;
         try {
@@ -223,7 +238,6 @@ export async function gradeTest(
         marksAwarded = Math.min(grading.marksAwarded || 0, question.marks);
         isCorrect = marksAwarded >= question.marks * 0.5;
       } catch {
-        // Fallback: simple keyword matching
         const studentWords = answer.answer.toLowerCase().split(/\s+/);
         const correctWords = question.correctAnswer.toLowerCase().split(/\s+/);
         const overlap = studentWords.filter(w => correctWords.includes(w)).length;
@@ -247,15 +261,51 @@ export async function gradeTest(
     });
   }
 
-  const weakConcepts = gradedQuestions
-    .filter(q => !q.isCorrect)
-    .map(q => q.conceptId)
-    .filter((v, i, a) => a.indexOf(v) === i);
+  const weakConcepts = [...new Set(gradedQuestions.filter(q => !q.isCorrect).map(q => q.conceptId))];
+  const strongConcepts = [...new Set(gradedQuestions.filter(q => q.isCorrect).map(q => q.conceptId))];
 
-  const strongConcepts = gradedQuestions
-    .filter(q => q.isCorrect)
-    .map(q => q.conceptId)
-    .filter((v, i, a) => a.indexOf(v) === i);
+  const totalTimeTaken = answers.reduce((sum, a) => sum + a.timeTaken, 0);
+  const totalTimeEstimate = questions.reduce((sum, q) => sum + q.timeEstimate, 0);
+
+  let insights = {
+    weakConcepts,
+    strongConcepts,
+    improvementAreas: weakConcepts,
+    suggestion: `Focus on reviewing ${weakConcepts.length} concept(s) where you need improvement.`,
+    encouragement: "",
+    weeklyGoal: "",
+  };
+
+  try {
+    const weakNames = weakConcepts.map(id => CONCEPTS.find(c => c.id === id)?.name || id);
+    const strongNames = strongConcepts.map(id => CONCEPTS.find(c => c.id === id)?.name || id);
+    const insightsPrompt = getInsightsPrompt(
+      subject, totalScore, totalMarks,
+      weakNames, strongNames,
+      totalTimeTaken, totalTimeEstimate,
+      studentName || "Student"
+    );
+
+    let insightsResponse: string;
+    try {
+      insightsResponse = await generateWithGemini(insightsPrompt);
+    } catch {
+      insightsResponse = await generateWithGroq(insightsPrompt);
+    }
+
+    const cleaned = insightsResponse.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const aiInsights = JSON.parse(cleaned);
+    insights = {
+      weakConcepts,
+      strongConcepts,
+      improvementAreas: aiInsights.improvementAreas || weakConcepts,
+      suggestion: aiInsights.suggestion || insights.suggestion,
+      encouragement: aiInsights.encouragement || "",
+      weeklyGoal: aiInsights.weeklyGoal || "",
+    };
+  } catch {
+    // AI insights failed, use defaults
+  }
 
   const result = await TestResult.create({
     studentId,
@@ -265,15 +315,10 @@ export async function gradeTest(
     totalMarks,
     correctAnswers: correctCount,
     totalQuestions: answers.length,
-    timeTakenSeconds: answers.reduce((sum, a) => sum + a.timeTaken, 0),
+    timeTakenSeconds: totalTimeTaken,
     questions: gradedQuestions,
     percentage: totalMarks > 0 ? Math.round((totalScore / totalMarks) * 100) : 0,
-    insights: {
-      weakConcepts,
-      strongConcepts,
-      improvementAreas: weakConcepts,
-      suggestion: `Focus on reviewing ${weakConcepts.length} concept(s) where you need improvement.`,
-    },
+    insights,
   });
 
   return result;

@@ -52,10 +52,23 @@ export async function POST(req: NextRequest) {
       answers,
       generated.questions as any,
       generated.subject,
-      generated.type as "diagnostic" | "weekly" | "quiz"
+      generated.type as "diagnostic" | "weekly" | "quiz" | "review",
+      student.name
     );
 
-    for (const q of result.questions) {
+    const r = result as unknown as {
+      _id: unknown;
+      score: number;
+      totalMarks: number;
+      correctAnswers: number;
+      totalQuestions: number;
+      percentage: number;
+      timeTakenSeconds: number;
+      insights: Record<string, unknown>;
+      questions: { questionId: string; isCorrect: boolean; conceptId: string; marks: number }[];
+    };
+
+    for (const q of r.questions) {
       const timedAnswer = answers.find((a: { questionId: string }) => a.questionId === q.questionId);
       const question = generated.questions.find((q2: { id: string }) => q2.id === q.questionId);
       await updateConceptMastery(
@@ -70,15 +83,15 @@ export async function POST(req: NextRequest) {
     await GeneratedTest.deleteOne({ testId });
 
     return NextResponse.json({
-      testResultId: result._id,
-      score: result.score,
-      totalMarks: result.totalMarks,
-      correctAnswers: result.correctAnswers,
-      totalQuestions: result.totalQuestions,
-      percentage: result.percentage,
-      timeTakenSeconds: result.timeTakenSeconds,
-      insights: result.insights,
-      questions: result.questions,
+      testResultId: r._id,
+      score: r.score,
+      totalMarks: r.totalMarks,
+      correctAnswers: r.correctAnswers,
+      totalQuestions: r.totalQuestions,
+      percentage: r.percentage,
+      timeTakenSeconds: r.timeTakenSeconds ?? 0,
+      insights: r.insights,
+      questions: r.questions,
     });
   } catch (error) {
     console.error("Test grading error:", error);

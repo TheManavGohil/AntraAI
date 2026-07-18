@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import { Student, GeneratedTest } from "@/lib/db/schemas";
 import { generateTest } from "@/lib/test/generator";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/middleware/rate-limit";
 import { Types } from "mongoose";
 
 export async function POST(req: NextRequest) {
@@ -37,10 +38,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const rl = checkRateLimit(studentId, RATE_LIMITS.testGenerate.maxRequests, RATE_LIMITS.testGenerate.windowMs);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please wait before generating another test." },
+        { status: 429 }
+      );
+    }
+
     const test = await generateTest(
       studentId,
       subject,
-      type as "diagnostic" | "weekly" | "quiz",
+      type as "diagnostic" | "weekly" | "quiz" | "review",
       student.class,
       conceptId
     );

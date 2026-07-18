@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import { ChatHistory, SocraticSession } from "@/lib/db/schemas";
-import { queryAssistant } from "@/lib/ai/rag";
+import { queryAssistant, classifyQueryIntent } from "@/lib/ai/rag";
 import { computeSubjectMastery } from "@/lib/mastery/bkt";
 import { authenticateStudent } from "@/lib/middleware/auth";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/middleware/rate-limit";
 
 const CONVERSATION_CONTEXT_SIZE = 10;
 const SOCRATIC_TIMEOUT_STEPS = 12;
@@ -14,8 +15,16 @@ export async function POST(req: NextRequest) {
     if (auth instanceof NextResponse) return auth;
     const { student, studentId } = auth;
 
+    const rl = checkRateLimit(studentId, RATE_LIMITS.chat.maxRequests, RATE_LIMITS.chat.windowMs);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please wait before sending another message." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
-    const { message, subject = "science", socraticMode = false, conceptId } = body;
+    const { message, subject: reqSubject, socraticMode = false, conceptId: reqConceptId } = body;
 
     if (!message) {
       return NextResponse.json(
@@ -23,6 +32,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const intent = await classifyQueryIntent(message);
+    const subject = reqSubject || intent.suggestedSubject;
+    const conceptId = reqConceptId || (intent.suggestedConcept ? intent.suggestedConcept.toLowerCase().replace(/\s+/g, "_") : undefined);
 
     await ChatHistory.create({
       studentId,

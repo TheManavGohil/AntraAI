@@ -14,6 +14,7 @@ import {
   getNextConcepts,
 } from "@/lib/mastery/knowledge-graph";
 import { CONCEPTS } from "@/lib/utils/constants";
+import { generateTest } from "@/lib/test/generator";
 import { Types } from "mongoose";
 
 export async function GET(req: NextRequest) {
@@ -103,6 +104,27 @@ export async function GET(req: NextRequest) {
       .limit(5)
       .select("subject score totalMarks percentage takenAt testType");
 
+    const scoreTrend = await TestResult.find({ studentId })
+      .sort({ takenAt: -1 })
+      .limit(20)
+      .select("subject percentage takenAt testType");
+
+    const conceptBreakdown: Record<string, { correct: number; total: number; percentage: number }> = {};
+    const allTests = await TestResult.find({ studentId }).select("questions");
+    for (const test of allTests) {
+      for (const q of test.questions) {
+        if (!conceptBreakdown[q.conceptId]) {
+          conceptBreakdown[q.conceptId] = { correct: 0, total: 0, percentage: 0 };
+        }
+        conceptBreakdown[q.conceptId].total++;
+        if (q.isCorrect) conceptBreakdown[q.conceptId].correct++;
+      }
+    }
+    for (const key of Object.keys(conceptBreakdown)) {
+      const cb = conceptBreakdown[key];
+      cb.percentage = cb.total > 0 ? Math.round((cb.correct / cb.total) * 100) : 0;
+    }
+
     return NextResponse.json({
       concepts: masteries.map(m => {
         const concept = CONCEPTS.find(c => c.id === m.conceptId);
@@ -131,6 +153,8 @@ export async function GET(req: NextRequest) {
       subjectMastery,
       learningPaths,
       recentTests,
+      scoreTrend,
+      conceptBreakdown,
     });
   } catch (error) {
     console.error("Mastery API error:", error);
@@ -146,7 +170,38 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { studentId, conceptId, isCorrect } = body;
+    const { studentId, conceptId, isCorrect, generateQuiz } = body;
+
+    if (generateQuiz) {
+      if (!studentId) {
+        return NextResponse.json(
+          { error: "studentId is required" },
+          { status: 400 }
+        );
+      }
+
+      if (!Types.ObjectId.isValid(studentId)) {
+        return NextResponse.json(
+          { error: "Invalid studentId format" },
+          { status: 400 }
+        );
+      }
+
+      const student = await Student.findById(studentId);
+      if (!student) {
+        return NextResponse.json({ error: "Student not found" }, { status: 404 });
+      }
+
+      const subject = body.subject || "science";
+      const test = await generateTest(studentId, subject, "quiz", student.class, conceptId);
+
+      return NextResponse.json({
+        testId: test.id,
+        questions: test.questions,
+        totalMarks: test.totalMarks,
+        timeLimitMinutes: test.timeLimitMinutes,
+      });
+    }
 
     if (!studentId || !conceptId || isCorrect === undefined) {
       return NextResponse.json(
