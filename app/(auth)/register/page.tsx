@@ -85,7 +85,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary">
-            Antra<span className="text-secondary">AI</span>
+            Yo<span className="text-secondary">Learn</span>
           </h1>
           <p className="text-muted mt-2">Create your student account</p>
         </div>
@@ -201,7 +201,7 @@ function ConsentStep({
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary">
-            Antra<span className="text-secondary">AI</span>
+            Yo<span className="text-secondary">Learn</span>
           </h1>
           <p className="text-muted mt-2">Parental Consent Verification</p>
         </div>

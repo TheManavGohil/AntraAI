@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AntraAI - Your Personal AI Tutor",
+  title: "YoLearn - Your Personal AI Tutor",
   description: "AI-powered personalized learning assistant for Maharashtra SSC board students",
 };
 

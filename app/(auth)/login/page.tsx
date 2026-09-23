@@ -32,7 +32,7 @@ export default function LoginPage() {
       localStorage.setItem("antraai_student_name", data.name);
       localStorage.setItem("antraai_student_class", String(data.class));
 
-      router.push("/chat");
+      router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -45,7 +45,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary">
-            Antra<span className="text-secondary">AI</span>
+            Yo<span className="text-secondary">Learn</span>
           </h1>
           <p className="text-muted mt-2">Welcome back! Log in to continue learning.</p>
         </div>

@@ -9,7 +9,7 @@ export default function Home() {
         {/* Logo / Brand */}
         <div className="mb-8">
           <h1 className="text-5xl font-bold text-primary mb-2">
-            Antra<span className="text-secondary">AI</span>
+            Yo<span className="text-secondary">Learn</span>
           </h1>
           <p className="text-muted text-lg">
             Your Personal AI Tutor for Maharashtra SSC Board

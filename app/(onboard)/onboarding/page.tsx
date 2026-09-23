@@ -157,7 +157,7 @@ export default function OnboardingPage() {
         <div className="w-full max-w-lg">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-primary">
-              Antra<span className="text-secondary">AI</span>
+              Yo<span className="text-secondary">Learn</span>
             </h1>
             <p className="text-muted mt-2">Let&apos;s personalize your learning experience</p>
           </div>
@@ -304,7 +304,7 @@ export default function OnboardingPage() {
         )}
 
         <button
-          onClick={() => router.push("/chat")}
+          onClick={() => router.push("/dashboard")}
           disabled={loading}
           className="w-full max-w-xs mx-auto py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
         >
