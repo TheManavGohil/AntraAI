@@ -3,12 +3,40 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface IStudent extends Document {
   _id: Types.ObjectId;
   name: string;
-  class: 9 | 10;
+  class: 9 | 10; // Keeping for backward compatibility
   schoolName: string;
   parentPhone: string;
   consentGiven: boolean;
   consentDate?: Date;
   preferredSubjects: string[];
+  tokens: number;
+  streak: number;
+  lastActiveDate?: Date;
+  board: string;
+  gradeRange: string;
+  createdAt: Date;
+}
+
+export interface ITutor extends Document {
+  _id: Types.ObjectId;
+  tutorId: string;
+  name: string;
+  subject: string;
+  board: string;
+  gradeRange: string;
+  tokenRate: number;
+  systemPrompt: string;
+  avatarUrl?: string;
+  createdAt: Date;
+}
+
+export interface ITokenTransaction extends Document {
+  _id: Types.ObjectId;
+  studentId: string;
+  amount: number;
+  type: "deduction" | "addition";
+  description: string;
+  relatedService: "chat" | "live_class" | "tools" | "deposit";
   createdAt: Date;
 }
 
@@ -114,7 +142,33 @@ const StudentSchema = new Schema<IStudent>({
   consentGiven: { type: Boolean, default: false },
   consentDate: { type: Date },
   preferredSubjects: { type: [String], default: ["science", "algebra", "geometry"] },
+  tokens: { type: Number, default: 20 },
+  streak: { type: Number, default: 0 },
+  lastActiveDate: { type: Date },
+  board: { type: String, default: "MSBSHSE" },
+  gradeRange: { type: String, default: "Grade 9-12" },
 }, { timestamps: { createdAt: true, updatedAt: false } });
+
+const TutorSchema = new Schema<ITutor>({
+  tutorId: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  subject: { type: String, required: true },
+  board: { type: String, required: true },
+  gradeRange: { type: String, required: true },
+  tokenRate: { type: Number, required: true, default: 2.5 },
+  systemPrompt: { type: String, required: true },
+  avatarUrl: { type: String },
+}, { timestamps: { createdAt: true, updatedAt: false } });
+
+const TokenTransactionSchema = new Schema<ITokenTransaction>({
+  studentId: { type: String, required: true, ref: "Student" },
+  amount: { type: Number, required: true },
+  type: { type: String, required: true, enum: ["deduction", "addition"] },
+  description: { type: String, required: true },
+  relatedService: { type: String, required: true, enum: ["chat", "live_class", "tools", "deposit"] },
+}, { timestamps: { createdAt: true, updatedAt: false } });
+
+TokenTransactionSchema.index({ studentId: 1, createdAt: -1 });
 
 const ConceptMasterySchema = new Schema<IConceptMastery>({
   studentId: { type: String, required: true, ref: "Student" },
@@ -217,6 +271,8 @@ SocraticSessionSchema.index({ studentId: 1, createdAt: -1 });
 SocraticSessionSchema.index({ studentId: 1, status: 1 });
 
 export const Student = mongoose.models.Student || mongoose.model<IStudent>("Student", StudentSchema);
+export const Tutor = mongoose.models.Tutor || mongoose.model<ITutor>("Tutor", TutorSchema);
+export const TokenTransaction = mongoose.models.TokenTransaction || mongoose.model<ITokenTransaction>("TokenTransaction", TokenTransactionSchema);
 export const ConceptMastery = mongoose.models.ConceptMastery || mongoose.model<IConceptMastery>("ConceptMastery", ConceptMasterySchema);
 export const TestResult = mongoose.models.TestResult || mongoose.model<ITestResult>("TestResult", TestResultSchema);
 export const ChatHistory = mongoose.models.ChatHistory || mongoose.model<IChatHistory>("ChatHistory", ChatHistorySchema);
