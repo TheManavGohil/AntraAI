@@ -7,6 +7,7 @@ const CHROMA_HOST = process.env.CHROMA_HOST || "localhost";
 const CHROMA_PORT = parseInt(process.env.CHROMA_PORT || "8000");
 const EMBEDDING_MODEL = "Xenova/all-MiniLM-L6-v2";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let embedder: any = null;
 
 async function getEmbedder() {
@@ -190,6 +191,7 @@ async function seedSampleContent() {
   const collection = await client.getOrCreateCollection({
     name: "antraai_textbooks",
     metadata: { "hnsw:space": "cosine" },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     embeddingFunction: ef as any,
   });
 

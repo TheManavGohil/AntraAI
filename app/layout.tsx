@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AntraAI - Your Personal AI Tutor",
+  title: "YoLearn - Your Personal AI Tutor",
   description: "AI-powered personalized learning assistant for Maharashtra SSC board students",
 };
 
@@ -27,7 +27,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50">
+      <body className="min-h-full bg-gray-900 text-white">
         {children}
       </body>
     </html>

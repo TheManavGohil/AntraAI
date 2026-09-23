@@ -33,7 +33,7 @@ import { updateConceptMastery as genUpdate } from "../lib/test/generator";
 
 let passed = 0;
 let failed = 0;
-let bugs: string[] = [];
+const bugs: string[] = [];
 
 (async () => {
 
@@ -295,7 +295,7 @@ const tests = [
 ];
 
 let ragCorrect = 0;
-let ragTotal = tests.length;
+const ragTotal = tests.length;
 
 for (const test of tests) {
   const results = await searchTextbooks(test.query, { nResults: 3 });

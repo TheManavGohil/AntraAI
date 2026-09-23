@@ -81,6 +81,7 @@ async function main() {
     masteryRows.length === concepts9th.length,
     `got ${masteryRows.length}, expected ${concepts9th.length}`
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const uniqueIds = new Set(masteryRows.map((m: any) => m.conceptId));
   assert(
     "initializeStudentMastery(9): all concept IDs are unique",
@@ -211,6 +212,7 @@ async function main() {
     const collections = await db.listCollections().toArray();
     for (const col of collections) {
       const indexes = await db.collection(col.name).indexes();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       console.log(`  ${col.name}: ${indexes.length} indexes [${indexes.map((i: any) => i.name).join(", ")}]`);
     }
   }
@@ -220,12 +222,14 @@ async function main() {
   try {
     await getWeakConcepts("invalid-id-not-objectid", 5);
     assert("getWeakConcepts with invalid ID returns empty (no throw)", true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     assert("getWeakConcepts with invalid ID: throws gracefully", false, `${e.constructor.name}: ${e.message?.slice(0, 100)}`);
   }
   try {
     const result = await getWeakConcepts("507f1f77bcf86cd799439011", 5);
     assert("getWeakConcepts with non-existent student returns empty array", result.length === 0, `got ${result.length}`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     assert("getWeakConcepts with non-existent student throws", false, `${e.constructor.name}: ${e.message?.slice(0, 100)}`);
   }

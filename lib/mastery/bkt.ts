@@ -229,7 +229,6 @@ export async function getConceptsForTest(
   // Distribution: 60% weak, 30% review, 10% strong
   const weakCount = Math.floor(count * 0.6);
   const reviewCount = Math.floor(count * 0.3);
-  const strongCount = count - weakCount - reviewCount;
 
   const result: { concept: Concept; mastery: number; priority: "weak" | "review" | "strong" }[] = [];
   const usedIds = new Set<string>();

@@ -6,7 +6,6 @@ export interface SpacedRepetitionCard {
 }
 
 const MIN_EASINESS_FACTOR = 1.3;
-const DEFAULT_EASINESS_FACTOR = 2.5;
 
 export function performanceRating(isCorrect: boolean, timeTakenSeconds: number, timeEstimate: number): number {
   if (!isCorrect) {
@@ -51,7 +50,6 @@ export function sm2(
   }
 
   let newInterval: number;
-  let newRepetitions: number;
 
   if (repetitions === 0) {
     newInterval = 1;
@@ -61,7 +59,7 @@ export function sm2(
     newInterval = Math.round(interval * easinessFactor);
   }
 
-  newRepetitions = repetitions + 1;
+  const newRepetitions = repetitions + 1;
 
   return {
     interval: newInterval,

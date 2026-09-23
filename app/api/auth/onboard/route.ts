@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     if (diagnosticAnswers && Array.isArray(diagnosticAnswers)) {
       let totalCorrect = 0;
-      let totalQuestions = diagnosticAnswers.length;
+      const totalQuestions = diagnosticAnswers.length;
 
       for (const answer of diagnosticAnswers) {
         if (answer.conceptId && typeof answer.isCorrect === "boolean") {

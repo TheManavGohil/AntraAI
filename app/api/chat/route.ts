@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db/mongodb";
-import { ChatHistory, SocraticSession } from "@/lib/db/schemas";
+import { ChatHistory, SocraticSession, Tutor, TokenTransaction, Student } from "@/lib/db/schemas";
 import { queryAssistant, classifyQueryIntent } from "@/lib/ai/rag";
 import { computeSubjectMastery } from "@/lib/mastery/bkt";
 import { authenticateStudent } from "@/lib/middleware/auth";
@@ -9,6 +8,7 @@ import { CONCEPTS } from "@/lib/utils/constants";
 
 const CONVERSATION_CONTEXT_SIZE = 10;
 const SOCRATIC_TIMEOUT_STEPS = 12;
+const CHAT_TOKEN_COST = 1;
 
 function matchConceptId(name: string, subject: string, studentClass: number): string | undefined {
   const normalized = name.toLowerCase().replace(/[^a-z0-9]/g, "_").replace(/_+/g, "_");
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { message, subject: reqSubject, socraticMode = false, conceptId: reqConceptId } = body;
+    const { message, subject: reqSubject, socraticMode = false, conceptId: reqConceptId, tutorId } = body;
 
     if (!message) {
       return NextResponse.json(
@@ -48,6 +48,31 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    if (student.tokens < CHAT_TOKEN_COST) {
+      return NextResponse.json(
+        { error: "Insufficient tokens to send message. Please add more tokens." },
+        { status: 402 }
+      );
+    }
+
+    let tutorSystemPrompt = "";
+    if (tutorId) {
+       const tutor = await Tutor.findOne({ tutorId });
+       if (tutor) {
+          tutorSystemPrompt = tutor.systemPrompt;
+       }
+    }
+
+    // Deduct tokens
+    await Student.findByIdAndUpdate(student._id, { $inc: { tokens: -CHAT_TOKEN_COST } });
+    await TokenTransaction.create({
+      studentId,
+      amount: CHAT_TOKEN_COST,
+      type: "deduction",
+      description: `Chat message with tutor ${tutorId || 'general'}`,
+      relatedService: "chat"
+    });
 
     const intent = await classifyQueryIntent(message);
     const subject = reqSubject || (intent.suggestedSubject !== "general" ? intent.suggestedSubject : student.preferredSubjects?.[0] || "science");
@@ -68,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     const conversationContext = recentHistory
       .slice(0, -1)
-      .map(m => `${m.role === "user" ? student.name : "AntraAI"}: ${m.content}`)
+      .map(m => `${m.role === "user" ? student.name : "YoLearn"}: ${m.content}`)
       .join("\n");
 
     const masteryPercent = await computeSubjectMastery(studentId, subject);
@@ -92,7 +117,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const response = await queryAssistant(message, {
+    // Append tutor persona if available
+    let customInstructions = "";
+    if (tutorSystemPrompt) {
+        customInstructions = `\n\nFollow this persona and system instruction strictly: ${tutorSystemPrompt}`;
+    }
+
+    const response = await queryAssistant(message + customInstructions, {
       studentName: student.name,
       studentClass: student.class,
       subject,
@@ -159,7 +190,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      response: response.answer,
+      reply: response.answer, // change to reply to match frontend expecting data.reply
       sources: response.sources,
       socraticSession: socraticSessionUpdate,
     });
