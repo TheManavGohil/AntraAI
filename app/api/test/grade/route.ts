@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
       studentId,
       testId,
       answers,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       generated.questions as any,
       generated.subject,
       generated.type as "diagnostic" | "weekly" | "quiz" | "review",

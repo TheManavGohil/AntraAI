@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db/mongodb";
 import { ChatHistory, SocraticSession, Tutor, TokenTransaction, Student } from "@/lib/db/schemas";
 import { queryAssistant, classifyQueryIntent } from "@/lib/ai/rag";
 import { computeSubjectMastery } from "@/lib/mastery/bkt";
 import { authenticateStudent } from "@/lib/middleware/auth";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/middleware/rate-limit";
 import { CONCEPTS } from "@/lib/utils/constants";
-import { Types } from "mongoose";
 
 const CONVERSATION_CONTEXT_SIZE = 10;
 const SOCRATIC_TIMEOUT_STEPS = 12;

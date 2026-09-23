@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 export default function LiveClassPage() {
@@ -8,13 +8,12 @@ export default function LiveClassPage() {
   const params = useParams();
   const tutorId = params.tutorId as string;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [tutor, setTutor] = useState<any>(null);
   const [tokens, setTokens] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState("");
-
-  const studentId = typeof window !== "undefined" ? localStorage.getItem("antraai_student_id") : null;
 
   useEffect(() => {
     async function fetchData() {
